@@ -460,7 +460,7 @@ enum ProtoOATrendbarPeriod {
 
 /** Historical Trendbar entity. */
 message ProtoOATrendbar {
-    required int64 volume = 3; // Bar volume in cents.
+    required int64 volume = 3; // Volume in ticks.
     optional ProtoOATrendbarPeriod period = 4 [default = M1]; // Bar period.
     optional int64 low = 5; // Low price of the bar.
     optional uint64 deltaOpen = 6; // Delta between open and low price. open = low + deltaOpen.
