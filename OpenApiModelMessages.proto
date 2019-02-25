@@ -90,9 +90,9 @@ message ProtoOASymbol {
     optional ProtoOADayOfWeek swapRollover3Days = 6 [default = MONDAY]; // Day of the week when 3x rollover is charged.
     optional double swapLong = 7; // SWAP charge for long positions.
     optional double swapShort = 8; // SWAP charge for short positions.
-    optional int64 maxVolume = 9; // Maximum allowed volume for an order with a symbol.
-    optional int64 minVolume = 10; // Minimum allowed volume for an order with a symbol.
-    optional int64 stepVolume = 11; // Multiplier of the volume for an order.
+    optional int64 maxVolume = 9; // Maximum allowed volume in cents for an order with a symbol.
+    optional int64 minVolume = 10; // Minimum allowed volume in cents for an order with a symbol.
+    optional int64 stepVolume = 11; // Step of the volume in cents for an order.
     optional uint64 maxExposure = 12; // Value of max exposure per symbol, per account. Blocks execution if breached.
     repeated ProtoOAInterval schedule = 13; // Symbol trading interval, specified in seconds starting from SUNDAY 00:00 in specified time zone.
     required int64 commission = 14; // Commission base amount. Total commission depends on commissionType.
@@ -396,6 +396,7 @@ enum ProtoOAChangeBalanceType {
     BALANCE_DEPOSIT_MANAGEMENT_FEE = 27; // Mirroring commission.
     BALANCE_WITHDRAW_MANAGEMENT_FEE = 28; // Mirroring commission.
     BALANCE_DEPOSIT_PERFORMANCE_FEE = 29; // Mirroring commission.
+    BALANCE_WITHDRAW_INACTIVITY_FEE = 35;  // Withdraw of inactivity fee from the balance CS-10762
 }
 
 /** Execution entity. */
@@ -471,7 +472,7 @@ message ProtoOATrendbar {
 
 /** Expected margin computation entity. */
 message ProtoOAExpectedMargin {
-    required int64 volume = 1; // Volume used for computation.
+    required int64 volume = 1; // Volume in cents used for computation of expected margin.
     required int64 buyMargin = 2; // Buy margin amount in cents.
     required int64 sellMargin = 3; // Sell margin amount in cents.
 }
