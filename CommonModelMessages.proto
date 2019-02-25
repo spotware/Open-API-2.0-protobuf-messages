@@ -40,19 +40,3 @@ message ProtoDoubleRange {
     optional double from = 1;
     optional double to = 2;
 }
-
-enum ProtoTradeSide {
-    BUY = 1;
-    SELL = 2;
-}
-
-enum ProtoQuoteType {
-    BID = 1;
-    ASK = 2;
-}
-
-enum ProtoTimeInForce {
-    GOOD_TILL_DATE = 1;
-    GOOD_TILL_CANCEL = 2;
-    IMMEDIATE_OR_CANCEL = 3;
-}
