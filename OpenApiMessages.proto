@@ -579,3 +579,11 @@ message ProtoOAAccountLogoutRes {
 
     required int64 ctidTraderAccountId = 2;  // The unique identifier of the trader's account in cTrader platform.
 }
+
+/** Event that is sent when the established session for an account is dropped on the server side.
+ A new session must be authorized for the account.  */
+message ProtoOAAccountDisconnectEvent {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ACCOUNT_DISCONNECT_EVENT];
+
+    required int64 ctidTraderAccountId = 2;  // The unique identifier of the trader's account in cTrader platform.
+}
