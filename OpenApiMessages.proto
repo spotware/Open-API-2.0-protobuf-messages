@@ -43,9 +43,10 @@ message ProtoOAErrorRes {
     optional int64 ctidTraderAccountId = 2; //The unique identifier of the trader's account in cTrader platform.
     required string errorCode = 3; // The name of the ProtoErrorCode or the other custom ErrorCodes (e.g. ProtoCHErrorCode).
     optional string description = 4; // The error description.
+    optional int64 maintenanceEndTimestamp = 5; // The timestamp in seconds when the current maintenance session will be ended.
 }
 
-/** The event that is sent when the connection with the client application is cancelled by the server. All the sessions for the traders' accounts will be terminated. */
+/** Event that is sent when the connection with the client application is cancelled by the server. All the sessions for the traders' accounts will be terminated. */
 message ProtoOAClientDisconnectEvent {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_CLIENT_DISCONNECT_EVENT];
 
@@ -100,7 +101,7 @@ message ProtoOANewOrderReq {
     optional ProtoOAOrderTriggerMethod stopTriggerMethod = 23 [default = TRADE]; // Trigger method for the STOP or the STOP_LIMIT pending order.
 }
 
-/** The event that is sent following the successful order acceptance or execution by the server. Acts as response to the ProtoOANewOrderReq, ProtoOACancelOrderReq, ProtoOAAmendOrderReq, ProtoOAAmendPositionSLTPReq, ProtoOAClosePositionReq requests. Also, the event is sent when a Deposit/Withdrawal took place. */
+/** Event that is sent following the successful order acceptance or execution by the server. Acts as response to the ProtoOANewOrderReq, ProtoOACancelOrderReq, ProtoOAAmendOrderReq, ProtoOAAmendPositionSLTPReq, ProtoOAClosePositionReq requests. Also, the event is sent when a Deposit/Withdrawal took place. */
 message ProtoOAExecutionEvent {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_EXECUTION_EVENT];
 
@@ -429,8 +430,8 @@ message ProtoOASpotEvent {
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     required int64 symbolId = 3; // Unique identifier of the Symbol in cTrader platform.
-    optional uint64 bid = 4; // Bid price.
-    optional uint64 ask = 5; // Ask price.
+    optional uint64 bid = 4; // Bid price. Specified in 1/100_000 of unit of a price. (e.g. 1.23 -> 123_000)
+    optional uint64 ask = 5; // Ask price. Specified in 1/100_000 of unit of a price.
     repeated ProtoOATrendbar trendbar = 6; // Returns live trend bar. Requires subscription on the trend bars.
 }
 
@@ -570,14 +571,14 @@ message ProtoOASymbolCategoryListRes {
 message ProtoOAAccountLogoutReq {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ACCOUNT_LOGOUT_REQ];
 
-    required int64 ctidTraderAccountId = 2;  // The unique identifier of the trader's account in cTrader platform.
+    required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
 }
 
 /** Response to the ProtoOATraderLogoutReq request. */
 message ProtoOAAccountLogoutRes {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ACCOUNT_LOGOUT_RES];
 
-    required int64 ctidTraderAccountId = 2;  // The unique identifier of the trader's account in cTrader platform.
+    required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
 }
 
 /** Event that is sent when the established session for an account is dropped on the server side.
@@ -585,5 +586,5 @@ message ProtoOAAccountLogoutRes {
 message ProtoOAAccountDisconnectEvent {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ACCOUNT_DISCONNECT_EVENT];
 
-    required int64 ctidTraderAccountId = 2;  // The unique identifier of the trader's account in cTrader platform.
+    required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
 }
