@@ -391,6 +391,23 @@ message ProtoOAGetAccountListByAccessTokenRes {
     repeated ProtoOACtidTraderAccount ctidTraderAccount = 4; // The list of the accounts.
 }
 
+/** Request to refresh the access token using refresh token of granted trader's account. */
+message ProtoOARefreshTokenReq {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_REFRESH_TOKEN_REQ];
+
+    required string refreshToken = 2; // The Refresh Token issued for updating Access Token.
+}
+
+/** Response to the ProtoOARefreshTokenReq request. */
+message ProtoOARefreshTokenRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_REFRESH_TOKEN_RES];
+
+    required string accessToken = 2; // The Access Token issued for providing access to the Trader's Account.
+    required string tokenType = 3; // bearer
+    required int64 expiresIn = 4; // Access Token expiration in seconds
+    required string refreshToken = 5;
+}
+
 //+------------------------------------------------------------------+
 //|                              Quotes                              |
 //+------------------------------------------------------------------+

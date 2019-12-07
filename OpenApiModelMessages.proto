@@ -80,6 +80,8 @@ enum ProtoOAPayloadType {
     PROTO_OA_MARGIN_CALL_UPDATE_RES = 2170;
     PROTO_OA_MARGIN_CALL_UPDATE_EVENT = 2171;
     PROTO_OA_MARGIN_CALL_TRIGGER_EVENT = 2172;
+    PROTO_OA_REFRESH_TOKEN_REQ = 2173;
+    PROTO_OA_REFRESH_TOKEN_RES = 2174;
 }
 
 /** Asset entity. */
@@ -228,11 +230,13 @@ message ProtoOATrader {
     optional uint32 leverageInCents = 10; // Account leverage (e.g. If leverage = 1:50 then value = 5000).
     optional ProtoOATotalMarginCalculationType totalMarginCalculationType = 11; // Margin computation type for the account (MAX, SUM, NET).
     optional uint32 maxLeverage = 12; // Maximum allowed leverage for the account. Used as validation when a Trader can change leverage value.
-    optional bool frenchRisk = 13; // If TRUE then account is AMF compliant.
+    optional bool frenchRisk = 13 [deprecated = true]; // If TRUE then account is AMF compliant.
     optional int64 traderLogin = 14; // ID of the account that is unique per server (Broker).
     optional ProtoOAAccountType accountType = 15 [default = HEDGED]; // Account type: HEDGED, NETTED, etc.
     optional string brokerName = 16; // Some whitelabel assigned to trader by broker at the moment of account creation.
     optional int64 registrationTimestamp = 17; // Unix timestamp of the account registration. Should be used as minimal date in historical data requests.
+    optional bool isLimitedRisk = 18;
+    optional ProtoOALimitedRiskMarginCalculationStrategy limitedRiskMarginCalculationStrategy = 19;
 }
 
 /** Position status ENUM. */
@@ -483,8 +487,8 @@ message ProtoOATrendbar {
     optional ProtoOATrendbarPeriod period = 4 [default = M1]; // Bar period.
     optional int64 low = 5; // Low price of the bar.
     optional uint64 deltaOpen = 6; // Delta between open and low price. open = low + deltaOpen.
-    optional uint64 deltaClose = 7; // Delta between open and low price. close = low + deltaClose.
-    optional uint64 deltaHigh = 8; // Delta between open and low price. high = low + deltaHigh.
+    optional uint64 deltaClose = 7; // Delta between close and low price. close = low + deltaClose.
+    optional uint64 deltaHigh = 8; // Delta between high and low price. high = low + deltaHigh.
     optional uint32 utcTimestampInMinutes = 9; // Timestamp of the bar. Equal to the timestamp of the open tick.
 }
 
@@ -601,4 +605,9 @@ enum ProtoOAErrorCode {
     UNABLE_TO_CANCEL_ORDER = 134; // Unable to cancel order.
     UNABLE_TO_AMEND_ORDER = 135; // Unable to amend order.
     SHORT_SELLING_NOT_ALLOWED = 136; // Short selling is not allowed.
+}
+
+enum ProtoOALimitedRiskMarginCalculationStrategy {
+    ACCORDING_TO_LEVERAGE = 0;
+    ACCORDING_TO_GSL = 1;
 }
