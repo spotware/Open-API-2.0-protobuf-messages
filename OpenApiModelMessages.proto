@@ -120,6 +120,7 @@ message ProtoOASymbol {
     optional ProtoOATradingMode tradingMode = 27 [default = ENABLED]; // Rules for trading with the symbol. See ProtoOATradingMode for details.
     optional ProtoOADayOfWeek rolloverCommission3Days = 28 [default = MONDAY]; //Day of the week (in UTC) when Administrative Fee charge amount will be tripled. Applied only if RolloverChargePeriod = 0 or 1
     optional ProtoOASwapCalculationType swapCalculationType = 29 [default = POINTS]; //Specifies type of SWAP computation as points (0) or interest (1, annual, in percent)
+    optional int64 lotSize = 30; //Lot size of the Symbol (in cents)
 }
 
 /** Lightweight symbol entity. */
@@ -482,8 +483,8 @@ message ProtoOATrendbar {
     optional ProtoOATrendbarPeriod period = 4 [default = M1]; // Bar period.
     optional int64 low = 5; // Low price of the bar.
     optional uint64 deltaOpen = 6; // Delta between open and low price. open = low + deltaOpen.
-    optional uint64 deltaClose = 7; // Delta between close and low price. close = low + deltaClose.
-    optional uint64 deltaHigh = 8; // Delta between high and low price. high = low + deltaHigh.
+    optional uint64 deltaClose = 7; // Delta between open and low price. close = low + deltaClose.
+    optional uint64 deltaHigh = 8; // Delta between open and low price. high = low + deltaHigh.
     optional uint32 utcTimestampInMinutes = 9; // Timestamp of the bar. Equal to the timestamp of the open tick.
 }
 
