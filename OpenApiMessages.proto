@@ -443,6 +443,14 @@ message ProtoOASubscribeLiveTrendbarReq {
     required ProtoOATrendbarPeriod period = 3; // Specifies period of trend bar series (e.g. M1, M10, etc.).
     required int64 symbolId = 4; // Unique identifier of the Symbol in cTrader platform.
 }
+
+/** Response to the ProtoOASubscribeLiveTrendbarReq request. */
+message ProtoOASubscribeLiveTrendbarRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_SUBSCRIBE_LIVE_TRENDBAR_RES];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+}
+
 /** Request for unsubscribing from the live trend bars. */
 message ProtoOAUnsubscribeLiveTrendbarReq {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_UNSUBSCRIBE_LIVE_TRENDBAR_REQ];
@@ -450,6 +458,13 @@ message ProtoOAUnsubscribeLiveTrendbarReq {
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     required ProtoOATrendbarPeriod period = 3; // Specifies period of trend bar series (e.g. M1, M10, etc.).
     required int64 symbolId = 4; // Unique identifier of the Symbol in cTrader platform.
+}
+
+/** Response to the ProtoOASubscribeLiveTrendbarReq request. */
+message ProtoOAUnsubscribeLiveTrendbarRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_UNSUBSCRIBE_LIVE_TRENDBAR_RES];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
 }
 
 /** Request for getting historical trend bars for the symbol. */
@@ -587,4 +602,47 @@ message ProtoOAAccountDisconnectEvent {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ACCOUNT_DISCONNECT_EVENT];
 
     required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
+}
+
+/** Request for a list of existing margin call thresholds configured for a user. */
+message ProtoOAMarginCallListReq {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_MARGIN_CALL_LIST_REQ];
+
+    required int64 ctidTraderAccountId = 2;
+}
+
+/** Response with a list of existing user Margin Calls, usually contains 3 items. */
+message ProtoOAMarginCallListRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_MARGIN_CALL_LIST_RES];
+
+    repeated ProtoOAMarginCall marginCall = 2;
+}
+
+/** Request to modify marginLevelThreshold of specified marginCallType for ctidTraderAccountId. */
+message ProtoOAMarginCallUpdateReq {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_MARGIN_CALL_UPDATE_REQ];
+
+    required int64 ctidTraderAccountId = 2;
+    required ProtoOAMarginCall marginCall = 3;
+}
+
+/** If this response received, it means that margin call was successfully updated. */
+message ProtoOAMarginCallUpdateRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_MARGIN_CALL_UPDATE_RES];
+}
+
+/** Event that is sent when a Margin Call threshold configuration is updated. */
+message ProtoOAMarginCallUpdateEvent {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_MARGIN_CALL_UPDATE_EVENT];
+
+    required int64 ctidTraderAccountId = 2;
+    required ProtoOAMarginCall marginCall = 3;
+}
+
+/** Event that is sent when account margin level reaches target marginLevelThreshold. Event is sent no more than once every 10 minutes to avoid spamming. */
+message ProtoOAMarginCallTriggerEvent {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_MARGIN_CALL_TRIGGER_EVENT];
+
+    required int64 ctidTraderAccountId = 2;
+    required ProtoOAMarginCall marginCall = 3;
 }

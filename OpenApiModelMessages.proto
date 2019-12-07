@@ -72,6 +72,14 @@ enum ProtoOAPayloadType {
     PROTO_OA_ACCOUNT_LOGOUT_REQ = 2162;
     PROTO_OA_ACCOUNT_LOGOUT_RES = 2163;
     PROTO_OA_ACCOUNT_DISCONNECT_EVENT = 2164;
+    PROTO_OA_SUBSCRIBE_LIVE_TRENDBAR_RES = 2165;
+    PROTO_OA_UNSUBSCRIBE_LIVE_TRENDBAR_RES = 2166;
+    PROTO_OA_MARGIN_CALL_LIST_REQ = 2167;
+    PROTO_OA_MARGIN_CALL_LIST_RES = 2168;
+    PROTO_OA_MARGIN_CALL_UPDATE_REQ = 2169;
+    PROTO_OA_MARGIN_CALL_UPDATE_RES = 2170;
+    PROTO_OA_MARGIN_CALL_UPDATE_EVENT = 2171;
+    PROTO_OA_MARGIN_CALL_TRIGGER_EVENT = 2172;
 }
 
 /** Asset entity. */
@@ -111,6 +119,7 @@ message ProtoOASymbol {
     optional string scheduleTimeZone = 26; // Time zone for the symbol trading intervals.
     optional ProtoOATradingMode tradingMode = 27 [default = ENABLED]; // Rules for trading with the symbol. See ProtoOATradingMode for details.
     optional ProtoOADayOfWeek rolloverCommission3Days = 28 [default = MONDAY]; //Day of the week (in UTC) when Administrative Fee charge amount will be tripled. Applied only if RolloverChargePeriod = 0 or 1
+    optional ProtoOASwapCalculationType swapCalculationType = 29 [default = POINTS]; //Specifies type of SWAP computation as points (0) or interest (1, annual, in percent)
 }
 
 /** Lightweight symbol entity. */
@@ -120,7 +129,7 @@ message ProtoOALightSymbol {
     optional bool enabled = 3; // If TRUE then symbol is visible for traders.
     optional int64 baseAssetId = 4; // Base asset.
     optional int64 quoteAssetId = 5; // Quote asset.
-    optional int64 symbolCategoryId = 6;  // Id of the symbol category used for symbols grouping.
+    optional int64 symbolCategoryId = 6; // Id of the symbol category used for symbols grouping.
     optional string description = 7;
 }
 
@@ -174,6 +183,12 @@ enum ProtoOATradingMode {
     DISABLED_WITHOUT_PENDINGS_EXECUTION = 1;
     DISABLED_WITH_PENDINGS_EXECUTION = 2;
     CLOSE_ONLY_MODE = 3;
+}
+
+/** Enum for specifying SWAP calculation type for symbol. */
+enum ProtoOASwapCalculationType {
+    POINTS = 0; //Specifies type of SWAP computation as points (0)
+    INTEREST = 1; //Specifies type of SWAP computation as interest (1, annual, in percent)
 }
 
 /** Enum for specifying access right for a trader. */
@@ -398,7 +413,7 @@ enum ProtoOAChangeBalanceType {
     BALANCE_DEPOSIT_MANAGEMENT_FEE = 27; // Mirroring commission.
     BALANCE_WITHDRAW_MANAGEMENT_FEE = 28; // Mirroring commission.
     BALANCE_DEPOSIT_PERFORMANCE_FEE = 29; // Mirroring commission.
-    BALANCE_WITHDRAW_INACTIVITY_FEE = 35;  // Withdraw of inactivity fee from the balance CS-10762
+    BALANCE_WITHDRAW_INACTIVITY_FEE = 35; // Withdraw of inactivity fee from the balance CS-10762
 }
 
 /** Execution entity. */
@@ -523,6 +538,20 @@ message ProtoOADepthQuote {
     optional uint64 ask = 5; // Ask price for ask quotes.
 }
 
+/** Margin call entity, specifies threshold for exact margin call type. Only 3 instances of margin calls are supported, identified by marginCallType. See ProtoOANotificationType for details. */
+message ProtoOAMarginCall {
+    required ProtoOANotificationType marginCallType = 1;
+    required double marginLevelThreshold = 2;
+    optional int64 utcLastUpdateTimestamp = 3;
+}
+
+/** Type of notification, currently only 3 instances of marginCall are supported. */
+enum ProtoOANotificationType {
+    MARGIN_LEVEL_THRESHOLD_1 = 61; // one of three margin calls, they are all similar.
+    MARGIN_LEVEL_THRESHOLD_2 = 62; // one of three margin calls, they are all similar.
+    MARGIN_LEVEL_THRESHOLD_3 = 63; // one of three margin calls, they are all similar.
+}
+
 /** Error code ENUM. */
 enum ProtoOAErrorCode {
     //Authorization
@@ -547,7 +576,7 @@ enum ProtoOAErrorCode {
     NOT_SUBSCRIBED_TO_SPOTS = 112; // When trying to subscribe to depth, trendbars, etc. without spot subscription.
     ALREADY_SUBSCRIBED = 113; // When subscription is requested for an active.
     SYMBOL_NOT_FOUND = 114; // Symbol not found.
-    UNKNOWN_SYMBOL = 115;  // Note: to be merged with SYMBOL_NOT_FOUND.
+    UNKNOWN_SYMBOL = 115; // Note: to be merged with SYMBOL_NOT_FOUND.
     INCORRECT_BOUNDARIES = 35; // When requested period (from,to) is too large or invalid values are set to from/to.
 
     //Trading
