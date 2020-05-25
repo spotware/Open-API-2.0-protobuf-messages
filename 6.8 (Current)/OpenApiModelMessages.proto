@@ -80,6 +80,8 @@ enum ProtoOAPayloadType {
     PROTO_OA_MARGIN_CALL_UPDATE_RES = 2170;
     PROTO_OA_MARGIN_CALL_UPDATE_EVENT = 2171;
     PROTO_OA_MARGIN_CALL_TRIGGER_EVENT = 2172;
+    PROTO_OA_REFRESH_TOKEN_REQ = 2173;
+    PROTO_OA_REFRESH_TOKEN_RES = 2174;
 }
 
 /** Asset entity. */
@@ -120,6 +122,7 @@ message ProtoOASymbol {
     optional ProtoOATradingMode tradingMode = 27 [default = ENABLED]; // Rules for trading with the symbol. See ProtoOATradingMode for details.
     optional ProtoOADayOfWeek rolloverCommission3Days = 28 [default = MONDAY]; //Day of the week (in UTC) when Administrative Fee charge amount will be tripled. Applied only if RolloverChargePeriod = 0 or 1
     optional ProtoOASwapCalculationType swapCalculationType = 29 [default = POINTS]; //Specifies type of SWAP computation as points (0) or interest (1, annual, in percent)
+    optional int64 lotSize = 30; //Lot size of the Symbol (in cents)
 }
 
 /** Lightweight symbol entity. */
@@ -223,15 +226,17 @@ message ProtoOATrader {
     optional int64 nonWithdrawableBonus = 6; // Broker's bonus that cannot be withdrew from the account as cash.
     optional ProtoOAAccessRights accessRights = 7 [default = FULL_ACCESS]; // Access rights that an owner has to the account in cTrader platform. See ProtoOAAccessRights for details.
     required int64 depositAssetId = 8; // Deposit currency of the account.
-    optional bool swapFree = 9; // If TRUE than account is Shariah compliant.
+    optional bool swapFree = 9; // If TRUE then account is Shariah compliant.
     optional uint32 leverageInCents = 10; // Account leverage (e.g. If leverage = 1:50 then value = 5000).
     optional ProtoOATotalMarginCalculationType totalMarginCalculationType = 11; // Margin computation type for the account (MAX, SUM, NET).
     optional uint32 maxLeverage = 12; // Maximum allowed leverage for the account. Used as validation when a Trader can change leverage value.
-    optional bool frenchRisk = 13; // If TRUE then account is AMF compliant.
+    optional bool frenchRisk = 13 [deprecated = true]; // If TRUE then account is AMF compliant.
     optional int64 traderLogin = 14; // ID of the account that is unique per server (Broker).
     optional ProtoOAAccountType accountType = 15 [default = HEDGED]; // Account type: HEDGED, NETTED, etc.
     optional string brokerName = 16; // Some whitelabel assigned to trader by broker at the moment of account creation.
     optional int64 registrationTimestamp = 17; // Unix timestamp of the account registration. Should be used as minimal date in historical data requests.
+    optional bool isLimitedRisk = 18; // If TRUE then account is compliant to use specific margin calculation strategy.
+    optional ProtoOALimitedRiskMarginCalculationStrategy limitedRiskMarginCalculationStrategy = 19 [default = ACCORDING_TO_LEVERAGE]; // Special strategy used in margin calculations for this account (if account isLimitedRisk).
 }
 
 /** Position status ENUM. */
@@ -413,7 +418,14 @@ enum ProtoOAChangeBalanceType {
     BALANCE_DEPOSIT_MANAGEMENT_FEE = 27; // Mirroring commission.
     BALANCE_WITHDRAW_MANAGEMENT_FEE = 28; // Mirroring commission.
     BALANCE_DEPOSIT_PERFORMANCE_FEE = 29; // Mirroring commission.
+    BALANCE_WITHDRAW_FOR_SUBACCOUNT = 30;
+    BALANCE_DEPOSIT_TO_SUBACCOUNT = 31;
+    BALANCE_WITHDRAW_FROM_SUBACCOUNT = 32;
+    BALANCE_DEPOSIT_FROM_SUBACCOUNT = 33;
     BALANCE_WITHDRAW_INACTIVITY_FEE = 35; // Withdraw of inactivity fee from the balance CS-10762
+    BALANCE_DEPOSIT_TRANSFER = 36;
+    BALANCE_WITHDRAW_TRANSFER = 37;
+    BALANCE_DEPOSIT_CONVERTED_BONUS = 38;
 }
 
 /** Execution entity. */
@@ -571,6 +583,8 @@ enum ProtoOAErrorCode {
     SERVER_IS_UNDER_MAINTENANCE = 109; // Server is under maintenance.
     CHANNEL_IS_BLOCKED = 110; // Operations are not allowed for this account.
     CONNECTIONS_LIMIT_EXCEEDED = 67; // Limit of connections is reached for this Open API client.
+    WORSE_GSL_NOT_ALLOWED = 68; // Not allowed to increase risk for Positions with Guaranteed Stop Loss.
+    SYMBOL_HAS_HOLIDAY = 69; // Trading disabled because symbol has holiday.
 
     //Pricing
     NOT_SUBSCRIBED_TO_SPOTS = 112; // When trying to subscribe to depth, trendbars, etc. without spot subscription.
@@ -600,4 +614,10 @@ enum ProtoOAErrorCode {
     UNABLE_TO_CANCEL_ORDER = 134; // Unable to cancel order.
     UNABLE_TO_AMEND_ORDER = 135; // Unable to amend order.
     SHORT_SELLING_NOT_ALLOWED = 136; // Short selling is not allowed.
+}
+
+enum ProtoOALimitedRiskMarginCalculationStrategy {
+    ACCORDING_TO_LEVERAGE = 0;
+    ACCORDING_TO_GSL = 1;
+    ACCORDING_TO_GSL_AND_LEVERAGE = 2;
 }
