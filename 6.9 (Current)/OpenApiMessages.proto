@@ -347,6 +347,7 @@ message ProtoOAExpectedMarginRes {
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     repeated ProtoOAExpectedMargin margin = 3; // The buy and sell margin estimate.
+    optional uint32 moneyDigits = 4;
 }
 
 /** Event that is sent when the margin allocated to a specific position is changed. */
@@ -356,6 +357,7 @@ message ProtoOAMarginChangedEvent {
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     required uint64 positionId = 3; // The unique ID of the position.
     required uint64 usedMargin = 4; // The new value of the margin used.
+    optional uint32 moneyDigits = 5;
 }
 
 /** Request for getting Trader's historical data of deposits and withdrawals. */

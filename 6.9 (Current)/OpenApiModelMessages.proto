@@ -89,6 +89,7 @@ message ProtoOAAsset {
     required int64 assetId = 1; // The unique asset ID.
     required string name = 2; // The asset name.
     optional string displayName = 3; // User friendly name.
+    optional int32 digits = 4;
 }
 
 /** Trading symbol entity. */
@@ -106,14 +107,14 @@ message ProtoOASymbol {
     optional int64 stepVolume = 11; // Step of the volume in cents for an order.
     optional uint64 maxExposure = 12; // Value of max exposure per symbol, per account. Blocks execution if breached.
     repeated ProtoOAInterval schedule = 13; // Symbol trading interval, specified in seconds starting from SUNDAY 00:00 in specified time zone.
-    required int64 commission = 14; // Commission base amount. Total commission depends on commissionType.
-    optional ProtoOACommissionType commissionType = 15 [default = USD_PER_MIL_USD]; // Commission type. See ProtoOACommissionType for details.
+    optional int64 commission = 14 [deprecated = true]; // Commission base amount. Total commission depends on commissionType.
+    optional ProtoOACommissionType commissionType = 15 [default = USD_PER_MILLION_USD]; // Commission type. See ProtoOACommissionType for details.
     optional uint32 slDistance = 16; // Minimum allowed distance between stop loss and current market price.
     optional uint32 tpDistance = 17; // Minimum allowed distance between take profit and current market price.
     optional uint32 gslDistance = 18; // Minimum allowed distance between guaranteed stop loss and current market price.
     optional int64 gslCharge = 19; // Guaranteed stop loss fee.
     optional ProtoOASymbolDistanceType distanceSetIn = 20 [default = SYMBOL_DISTANCE_IN_POINTS]; // Unit of distance measure for slDistance, tpDistance, gslDistance.
-    optional int64 minCommission = 21; // Minimum commission amount per trade.
+    optional int64 minCommission = 21 [deprecated = true]; // Minimum commission amount per trade.
     optional ProtoOAMinCommissionType minCommissionType = 22 [default = CURRENCY]; // Minimum commission Type. See ProtoOAMinCommissionType for details.
     optional string minCommissionAsset = 23 [default = "USD"]; // Currency for minimum commission. (USD or quote currency).
     optional int64 rolloverCommission = 24; // Amount of commission per trade for Shariah Compliant accounts in deposit currency (swapFree = TRUE).
@@ -121,8 +122,10 @@ message ProtoOASymbol {
     optional string scheduleTimeZone = 26; // Time zone for the symbol trading intervals.
     optional ProtoOATradingMode tradingMode = 27 [default = ENABLED]; // Rules for trading with the symbol. See ProtoOATradingMode for details.
     optional ProtoOADayOfWeek rolloverCommission3Days = 28 [default = MONDAY]; //Day of the week (in UTC) when Administrative Fee charge amount will be tripled. Applied only if RolloverChargePeriod = 0 or 1
-    optional ProtoOASwapCalculationType swapCalculationType = 29 [default = POINTS]; //Specifies type of SWAP computation as points (0) or interest (1, annual, in percent)
+    optional ProtoOASwapCalculationType swapCalculationType = 29 [default = PIPS]; //Specifies type of SWAP computation as PIPS (0) or PERCENTAGE (1, annual, in percent)
     optional int64 lotSize = 30; //Lot size of the Symbol (in cents)
+    optional int64 preciseTradingCommissionRate = 31;
+    optional int64 preciseMinCommission = 32;
 }
 
 /** Lightweight symbol entity. */
@@ -162,9 +165,9 @@ message ProtoOAInterval {
 
 /** Enum for specifying type of trading commission. */
 enum ProtoOACommissionType {
-    USD_PER_MIL_USD = 1; // USD per million USD volume - usually used for FX. Example: 50 USD for 1 mil USD of trading volume. In cents.
+    USD_PER_MILLION_USD = 1; // USD per million USD volume - usually used for FX. Example: 50 USD for 1 mil USD of trading volume. In cents.
     USD_PER_LOT = 2; // USD per 1 lot - usually used for CFDs and futures for commodities, and indices. Example: 15 USD for 1 contract. In cents.
-    PERCENTAGE = 3; // Percentage of trading volume - usually used for Equities. Example: 0.005% of notional trading volume. Multiplied by 100,00.
+    PERCENTAGE_OF_VALUE = 3; // Percentage of trading volume - usually used for Equities. Example: 0.005% of notional trading volume. Multiplied by 100,00.
     QUOTE_CCY_PER_LOT = 4; // Quote ccy of Symbol per 1 lot - will be used for CFDs and futures for commodities, and indices. Example: 15 EUR for 1 contract of DAX. In cents.
 }
 
@@ -190,8 +193,8 @@ enum ProtoOATradingMode {
 
 /** Enum for specifying SWAP calculation type for symbol. */
 enum ProtoOASwapCalculationType {
-    POINTS = 0; //Specifies type of SWAP computation as points (0)
-    INTEREST = 1; //Specifies type of SWAP computation as interest (1, annual, in percent)
+    PIPS = 0; //Specifies type of SWAP computation as PIPS (0)
+    PERCENTAGE = 1; //Specifies type of SWAP computation as PERCENTAGE (1, annual, in percent)
 }
 
 /** Enum for specifying access right for a trader. */
@@ -237,6 +240,7 @@ message ProtoOATrader {
     optional int64 registrationTimestamp = 17; // Unix timestamp of the account registration. Should be used as minimal date in historical data requests.
     optional bool isLimitedRisk = 18; // If TRUE then account is compliant to use specific margin calculation strategy.
     optional ProtoOALimitedRiskMarginCalculationStrategy limitedRiskMarginCalculationStrategy = 19 [default = ACCORDING_TO_LEVERAGE]; // Special strategy used in margin calculations for this account (if account isLimitedRisk).
+    optional uint32 moneyDigits = 20;
 }
 
 /** Position status ENUM. */
@@ -305,6 +309,7 @@ message ProtoOAPosition {
     optional bool guaranteedStopLoss = 12; // If TRUE then position's stop loss is guaranteedStopLoss.
     optional uint64 usedMargin = 13; // Amount of margin used for the position in deposit currency.
     optional ProtoOAOrderTriggerMethod stopLossTriggerMethod = 14 [default = TRADE]; // Stop trigger method for SL/TP of the position.
+    optional uint32 moneyDigits = 15;
 }
 
 /** Position/order trading details entity. */
@@ -342,6 +347,7 @@ message ProtoOAOrder {
     optional bool isStopOut = 22; // If TRUE then order was stopped out from server side.
     optional bool trailingStopLoss = 23; // If TRUE then order is trailingStopLoss. Valid for STOP_LOSS_TAKE_PROFIT order.
     optional ProtoOAOrderTriggerMethod stopTriggerMethod = 24 [default = TRADE]; // Trigger method for the order. Valid only for STOP and STOP_LIMIT orders.
+    optional uint32 moneyDigits = 25;
 }
 
 /** Execution event type ENUM. */
@@ -370,6 +376,7 @@ message ProtoOABonusDepositWithdraw {
     required int64 changeBonusTimestamp = 7; // Time when the bonus operation was executed.
     optional string externalNote = 8; // Note added to operation. Visible to the trader.
     optional int64 introducingBrokerId = 9; // ID of introducing broker who deposited/withdrew bonus.
+    optional uint32 moneyDigits = 10;
 }
 
 /** Bonus operation type ENUM. */
@@ -388,6 +395,7 @@ message ProtoOADepositWithdraw {
     optional string externalNote = 6; // Note added to operation. Visible to the trader.
     optional int64 balanceVersion = 7; // Balance version used to identify the final balance. Increments each time when the trader's account balance is changed.
     optional int64 equity = 8; // Total account's equity after balance operation was executed.
+    optional uint32 moneyDigits = 9;
 }
 
 /** Balance operation entity. Covers all cash movement operations related to account, trading, IB operations, mirroring, etc. */
@@ -446,6 +454,7 @@ message ProtoOADeal {
     optional int64 commission = 14; // Amount of trading commission associated with the deal.
     optional double baseToUsdConversionRate = 15; // Base to USD conversion rate on the time of deal execution.
     optional ProtoOAClosePositionDetail closePositionDetail = 16; // Closing position detail. Valid only for closing deal.
+    optional uint32 moneyDigits = 17;
 }
 
 /** Deal status ENUM. */
@@ -468,6 +477,7 @@ message ProtoOAClosePositionDetail {
     optional double quoteToDepositConversionRate = 6; // Quote/Deposit currency conversion rate on the time of closing deal execution.
     optional int64 closedVolume = 7; // Closed volume in cents.
     optional int64 balanceVersion = 8; // Balance version of the account related to closing deal operation.
+    optional uint32 moneyDigits = 9;
 }
 
 /** Trendbar period ENUM. */
