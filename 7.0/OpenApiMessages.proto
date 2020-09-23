@@ -1,3 +1,5 @@
+syntax = "proto2";
+
 option java_multiple_files = true;
 
 option java_generate_equals_and_hash = true;
@@ -197,6 +199,7 @@ message ProtoOASymbolsListReq {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_SYMBOLS_LIST_REQ];
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    optional bool includeArchivedSymbols = 3 [default = false];
 }
 
 /** Response to the ProtoOASymbolsListReq request. */
@@ -205,6 +208,7 @@ message ProtoOASymbolsListRes {
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     repeated ProtoOALightSymbol symbol = 3; // The list of symbols.
+    repeated ProtoOAArchivedSymbol archivedSymbol = 4; // The list of archived symbols.
 }
 
 /** Request for getting a full symbol entity. */
@@ -221,6 +225,7 @@ message ProtoOASymbolByIdRes {
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     repeated ProtoOASymbol symbol = 3; // Symbol entity with the full set of fields.
+    repeated ProtoOAArchivedSymbol archivedSymbol = 4; // Archived symbols.
 }
 
 /** Request for getting a conversion chain between two assets that consists of several symbols. Use when no direct quote is available */
@@ -347,7 +352,7 @@ message ProtoOAExpectedMarginRes {
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     repeated ProtoOAExpectedMargin margin = 3; // The buy and sell margin estimate.
-    optional uint32 moneyDigits = 4;
+    optional uint32 moneyDigits = 4; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects margin.buyMargin, margin.sellMargin.
 }
 
 /** Event that is sent when the margin allocated to a specific position is changed. */
@@ -357,7 +362,7 @@ message ProtoOAMarginChangedEvent {
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     required uint64 positionId = 3; // The unique ID of the position.
     required uint64 usedMargin = 4; // The new value of the margin used.
-    optional uint32 moneyDigits = 5;
+    optional uint32 moneyDigits = 5; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects usedMargin.
 }
 
 /** Request for getting Trader's historical data of deposits and withdrawals. */
