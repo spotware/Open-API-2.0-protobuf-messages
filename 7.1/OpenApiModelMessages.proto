@@ -243,7 +243,7 @@ message ProtoOATrader {
     optional uint32 leverageInCents = 10; // Account leverage (e.g. If leverage = 1:50 then value = 5000).
     optional ProtoOATotalMarginCalculationType totalMarginCalculationType = 11; // Margin computation type for the account (MAX, SUM, NET).
     optional uint32 maxLeverage = 12; // Maximum allowed leverage for the account. Used as validation when a Trader can change leverage value.
-    optional bool frenchRisk = 13 [deprecated = true]; // If TRUE then account is AMF compliant.
+    optional bool frenchRisk = 13 [deprecated = true]; // If TRUE then account is AMF compliant. Use isLimitedRisk and limitedRiskMarginCalculationStrategy.
     optional int64 traderLogin = 14; // ID of the account that is unique per server (Broker).
     optional ProtoOAAccountType accountType = 15 [default = HEDGED]; // Account type: HEDGED, NETTED, etc.
     optional string brokerName = 16; // Some whitelabel assigned to trader by broker at the moment of account creation.
@@ -434,13 +434,14 @@ enum ProtoOAChangeBalanceType {
     BALANCE_WITHDRAW_SWAP = 22; // SWAP charges.
 
     BALANCE_DEPOSIT_MANAGEMENT_FEE = 27; // Mirroring commission.
-    BALANCE_WITHDRAW_MANAGEMENT_FEE = 28; // Mirroring commission.
+    BALANCE_WITHDRAW_MANAGEMENT_FEE = 28 [deprecated = true]; // Mirroring commission. Deprecated since 7.1 in favor of BALANCE_WITHDRAW_COPY_FEE (34).
     BALANCE_DEPOSIT_PERFORMANCE_FEE = 29; // Mirroring commission.
     BALANCE_WITHDRAW_FOR_SUBACCOUNT = 30;
     BALANCE_DEPOSIT_TO_SUBACCOUNT = 31;
     BALANCE_WITHDRAW_FROM_SUBACCOUNT = 32;
     BALANCE_DEPOSIT_FROM_SUBACCOUNT = 33;
-    BALANCE_WITHDRAW_INACTIVITY_FEE = 35; // Withdraw of inactivity fee from the balance CS-10762
+    BALANCE_WITHDRAW_COPY_FEE = 34; // Withdrawal fees to Strategy Provider.
+    BALANCE_WITHDRAW_INACTIVITY_FEE = 35; // Withdraw of inactivity fee from the balance
     BALANCE_DEPOSIT_TRANSFER = 36;
     BALANCE_WITHDRAW_TRANSFER = 37;
     BALANCE_DEPOSIT_CONVERTED_BONUS = 38;
