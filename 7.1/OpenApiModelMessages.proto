@@ -434,7 +434,7 @@ enum ProtoOAChangeBalanceType {
     BALANCE_WITHDRAW_SWAP = 22; // SWAP charges.
 
     BALANCE_DEPOSIT_MANAGEMENT_FEE = 27; // Mirroring commission.
-    BALANCE_WITHDRAW_MANAGEMENT_FEE = 28 [deprecated = true]; // Mirroring commission. Deprecated since 7.1 in favor of BALANCE_WITHDRAW_COPY_FEE (34).
+    BALANCE_WITHDRAW_MANAGEMENT_FEE = 28; // Mirroring commission. Deprecated since 7.1 in favor of BALANCE_WITHDRAW_COPY_FEE (34).
     BALANCE_DEPOSIT_PERFORMANCE_FEE = 29; // Mirroring commission.
     BALANCE_WITHDRAW_FOR_SUBACCOUNT = 30;
     BALANCE_DEPOSIT_TO_SUBACCOUNT = 31;
