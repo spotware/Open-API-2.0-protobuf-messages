@@ -555,6 +555,8 @@ message ProtoOACtidTraderAccount {
     required uint64 ctidTraderAccountId = 1; // Unique identifier of the trader's account. Used to match responses to trader's accounts.cTrader platform. Different brokers might have different ids
     optional bool isLive = 2; // If TRUE then the account is belong to Live environment and live host must be used to authorize it
     optional int64 traderLogin = 3; // TraderLogin for a specific account. Value is displayed on Client App UI
+    optional int64 lastClosingDealTimestamp = 4;
+    optional int64 lastBalanceUpdateTimestamp = 5;
 }
 
 /** Asset class entity. */
